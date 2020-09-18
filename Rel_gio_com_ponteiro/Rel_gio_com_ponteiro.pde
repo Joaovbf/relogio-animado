@@ -1,13 +1,17 @@
 void setup() {
   size(800, 600);
+   println(hour());
 }
 
 float centroX = 200;
 float centroY = 200;
 float div_rad = 0.104719;
-float anguloMinuto = -1.57 + minute() * div_rad ; 
-float anguloHora = -1.57 + hour() * 0.261799;
-float anguloSegundo = -1.57 + second() * div_rad;
+int second = second();
+float anguloSegundo = -1.57 + second * div_rad;
+int minute = minute();
+float anguloMinuto = -1.57 + minute * div_rad + (div_rad / 60 * second) ; 
+int hour = hour();
+float anguloHora = -1.57 + (hour >= 12 ? hour - 12 : hour) * 0.523598 + (0.523598 / 60 * minute);
 float raio = 150;
 float larguraPonteiro = raio/20;
 float velocidadeAngularSegundo = 0.00174532925;
