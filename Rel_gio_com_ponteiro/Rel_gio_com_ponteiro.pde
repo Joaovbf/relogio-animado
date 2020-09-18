@@ -4,9 +4,10 @@ void setup(){
 
 float centroX = 200;
 float centroY = 200;
-float anguloMinuto = -1.5;
-float anguloHora = -1.5;
-float anguloSegundo = -1.5;
+float div_rad = 0.104719;
+float anguloMinuto = -1.57 + minute() * div_rad ; 
+float anguloHora = -1.57 + hour() * div_rad;
+float anguloSegundo = -1.57 + second() * div_rad;
 float raio = 150;
 float larguraPonteiro = raio/15;
 float velocidadeAngularSegundo = 0.00174532925;
