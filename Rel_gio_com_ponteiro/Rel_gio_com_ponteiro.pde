@@ -1,9 +1,13 @@
 PImage correia;
+import processing.sound.*;
+SoundFile file;
+
 void setup() {
   size(800, 720);
   println(hour());
   
   correia = loadImage("correia.png");
+  file = new SoundFile(this, "clock.mp3");
 }
 
 float centroX = 200;
@@ -22,6 +26,11 @@ float velocidadeAngularSegundo = 0.00174532925;
 float velocidadeAngularMinuto = velocidadeAngularSegundo/60;
 float velocidadeAngularHora = velocidadeAngularMinuto/60;
 int offset_y =360;
+int roda_width = 50;
+int roda_height = 50;
+int qtd_fundos = 5;
+int roda_giro = 5;
+
 void draw() {
   stroke(0);
   background(255, 255, 255);
@@ -81,7 +90,23 @@ void draw() {
     vertex(100 + (i * 340 / qtd_grad), -50 + offset_y);
     endShape();
   }
-
+  
+  //Roda lateral
+  fill(245, 203, 155); 
+  rect(centroX * 2, centroY - roda_height / 2, roda_width, roda_height);
+  for(int i = 0; i < qtd_fundos; i++){
+    fill(144, 86, 75);
+    if(isValueChanging && frameCount % 2 == 0){
+      if(roda_giro == 5){
+        roda_giro = 2;
+      } else {
+        roda_giro = 5;
+      }
+    } 
+    rect(centroX * 2, centroY - roda_height / 2 + i * roda_height / qtd_fundos + roda_giro, roda_width - 5, roda_height / qtd_fundos - 8);
+  }
+  
+  
   //Borda de fundo do relogio
   fill(27, 27, 27);
   circle(centroX, centroY, 420);
@@ -124,7 +149,7 @@ void draw() {
   fill(245, 203, 155);
   text("9", 20, centroY + 15); 
 
-
+  
 
   fill(245, 203, 155);
   translate(centroX, centroY);
@@ -170,7 +195,7 @@ void draw() {
   triangle(centroX+(larguraPonteiro)*(float)(Math.cos(anguloHora + Math.PI/2)), centroY+(larguraPonteiro)*(float)(Math.sin(anguloHora + Math.PI/2)), 
     centroX+(larguraPonteiro)*(float)(Math.cos(anguloHora - Math.PI/2)), centroX+(larguraPonteiro)*(float)(Math.sin(anguloHora - Math.PI/2)), 
     centroX+(raio/1.5)*(float)(Math.cos(anguloHora)), centroX+(raio/1.5)*(float)(Math.sin(anguloHora)));
-    
+  
   anguloSegundo += velocidadeAngularSegundo;
   fill(255, 0, 0);
   triangle(centroX+(larguraPonteiro/2)*(float)(Math.cos(anguloSegundo + Math.PI/2)), centroY+(larguraPonteiro/2)*(float)(Math.sin(anguloSegundo + Math.PI/2)), //Coordenadas X e Y do ponto da esquerda do ponteiro
@@ -182,4 +207,53 @@ void draw() {
   //Circulo do meio
   fill(255, 0, 0);  
   circle(centroX, centroY, 30);
+  
+  
+}
+
+boolean isRoda = false;
+void mousePressed(){
+  //Action roda lateral
+  if(mouseX >= centroX * 2 + 200 && mouseX <= centroX * 2 + 200  + roda_width && mouseY >= centroY - roda_height / 2 + 160 && mouseY < centroY - roda_height / 2  + roda_height + 160 ){
+    isRoda = true; 
+  }
+}
+
+boolean isValueChanging = false;
+void mouseReleased(){
+  isRoda = false;
+  isValueChanging = false;
+}
+
+int value = 0;
+int mouseXBefore = 0;
+int mouseYBefore = 0;
+void mouseDragged(){
+  int mult_velocidade = 60;
+  if(isRoda){
+    if(mouseY < mouseYBefore){
+      value += 1;
+      anguloMinuto += mult_velocidade * velocidadeAngularMinuto;
+      anguloHora +=  mult_velocidade * velocidadeAngularHora;
+      anguloSegundo += mult_velocidade * velocidadeAngularSegundo;
+      isValueChanging = true;
+      if(frameCount % 5 == 0){
+        file.play();
+      }
+    } else if(mouseY > mouseYBefore) {
+      value -= 1;
+      anguloMinuto -= mult_velocidade * velocidadeAngularMinuto;
+      anguloHora -= mult_velocidade * velocidadeAngularHora;
+      anguloSegundo -= mult_velocidade * velocidadeAngularSegundo;
+      isValueChanging = true;
+      if(frameCount % 5 == 0){
+        file.play();
+      }
+    } else {
+      isValueChanging = false;
+    }
+    mouseXBefore = mouseX;
+    mouseYBefore = mouseY;
+    println(value);
+  }
 }
